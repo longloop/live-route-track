@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Viewer</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+      var socket = io();
+      var map;
+      var markers = [];
+      function initMap() {
+        <% if (begining.lat != null && begining.long != null) {%>
+            var begining = {lat: <%=begining.lat%>, lng: <%=begining.long%>};
+        <%} else {%>
+            var begining = {lat: 26.84375, lng: 80.94289}; //Ideally the current location of user from gps
+        <%}%>
+          
+        <% if (destination.lat != null && destination.long != null) {%>
+            var destination = {lat: <%=destination.lat%>, lng: <%=destination.long%>};
+        <%} else {%>
+            var destination = {lat: 26.84701, lng: 80.94482}; //disaster
+        <%}%>
+          
+        map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 15,
+          center: begining
+        });
+                  
+        var markerb = new google.maps.Marker({
+           position: begining,
+           map: map,
+           icon : 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+        });
+          
+        var markerd = new google.maps.Marker({
+           position: destination,
+           map: map,
+           icon : 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+        });
+          
+      }
+          
+        // Adds a marker to the map and push to the array.
+        function addMarker(location) {
+          var marker = new google.maps.Marker({
+            position: location,
+           map: map
+          });
+          markers.push(marker);
+        }
+         
+        socket.on('latlong registered', function (newLatLng) {
+            //console.log(newLatLng);
+            console.log("addMarker({lat: "+newLatLng["latlong"][0]+", lng: "+newLatLng["latlong"][1]+"})");
+            var newLatLng = {lat: newLatLng["latlong"][0], lng: newLatLng["latlong"][1]};
+            //remove old marker
+            clearMarkers(0)
+            addMarker(newLatLng);
+            map.setZoom(15);
+            map.setCenter(newLatLng);
+        });
+        
+        function clearMarkers(tillLast){
+                for (var i=0; i<markers.length-tillLast; i++) {
+                    markers[i].setMap(null);
+                }
+        }
+        
+    </script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<%=gMapsKey%>&callback=initMap"
+    async defer></script>
+  </body>
+</html>

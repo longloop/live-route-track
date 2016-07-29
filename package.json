@@ -1,0 +1,17 @@
+{
+  "name": "location-live-map",
+  "version": "0.0.1",
+  "description": "See live location of the person on other end",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sumit Sinha",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.4.2",
+    "express": "^4.14.0",
+    "mongoose": "^4.5.2",
+    "socket.io": "^1.4.8"
+  }
+}
